@@ -3,8 +3,6 @@ import SwiftUI
 struct SettingsView: View {
   @ObservedObject var permissions: PermissionManager
   @ObservedObject var settings: AppSettings
-  @State private var testStatus = ""
-  @State private var isTesting = false
 
   var body: some View {
     TabView {
@@ -13,12 +11,17 @@ struct SettingsView: View {
           Label("General", systemImage: "gear")
         }
 
-      AISettingsView(settings: settings, testStatus: $testStatus, isTesting: $isTesting)
+      AIProviderSettingsView(settings: settings)
         .tabItem {
-          Label("AI", systemImage: "brain")
+          Label("AI Provider", systemImage: "brain")
+        }
+
+      PromptSettingsView(settings: settings)
+        .tabItem {
+          Label("Prompt", systemImage: "text.quote")
         }
     }
-    .frame(width: 450, height: 280)
+    .frame(width: 500, height: 380)
   }
 }
 
@@ -63,26 +66,39 @@ struct GeneralSettingsView: View {
   }
 }
 
-// MARK: - AISettingsView
+// MARK: - AIProviderSettingsView
 
-struct AISettingsView: View {
+struct AIProviderSettingsView: View {
   @ObservedObject var settings: AppSettings
-  @Binding var testStatus: String
-  @Binding var isTesting: Bool
+  @State private var testStatus = ""
+  @State private var isTesting = false
+  @State private var geminiAPIKey = ""
+  @State private var grokAPIKey = ""
+
+  private let keychainManager = KeychainManager()
 
   var body: some View {
     Form {
       Section {
-        TextField("URL", text: $settings.ollamaURL)
-          .textFieldStyle(.roundedBorder)
-        TextField("Model", text: $settings.ollamaModel)
-          .textFieldStyle(.roundedBorder)
+        Picker("Active Provider", selection: $settings.activeProvider) {
+          ForEach(AIProviderType.allCases, id: \.self) { provider in
+            Text(provider.displayName).tag(provider)
+          }
+        }
+        .pickerStyle(.segmented)
+      } header: {
+        Text("Select Provider")
+      }
 
+      providerConfigSection
+        .id(settings.activeProvider)
+
+      Section {
         HStack {
           Button("Test Connection") {
             testConnection()
           }
-          .disabled(isTesting)
+          .disabled(isTesting || !canTest)
 
           if isTesting {
             ProgressView()
@@ -95,21 +111,85 @@ struct AISettingsView: View {
               .foregroundColor(testStatus.contains("Success") ? .green : .red)
           }
         }
-      } header: {
-        Text("Ollama Configuration")
-      }
-
-      Section {
-        TextEditor(text: $settings.systemPrompt)
-          .font(.body)
-          .frame(height: 80)
-          .border(Color.secondary.opacity(0.3), width: 1)
-      } header: {
-        Text("System Prompt")
       }
     }
     .formStyle(.grouped)
     .padding()
+    .onAppear {
+      loadAPIKeys()
+    }
+    .onChange(of: settings.activeProvider) { _, _ in
+      testStatus = ""
+    }
+  }
+
+  @ViewBuilder
+  private var providerConfigSection: some View {
+    switch settings.activeProvider {
+    case .ollama:
+      Section {
+        TextField("URL", text: $settings.ollamaURL)
+          .textFieldStyle(.roundedBorder)
+        TextField("Model", text: $settings.ollamaModel)
+          .textFieldStyle(.roundedBorder)
+      } header: {
+        Text("Ollama Configuration")
+      } footer: {
+        Text("Ollama runs locally. No API key required.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+
+    case .gemini:
+      Section {
+        SecureField("API Key", text: $geminiAPIKey)
+          .textFieldStyle(.roundedBorder)
+          .onChange(of: geminiAPIKey) { _, newValue in
+            keychainManager.saveAPIKey(newValue, for: .gemini)
+          }
+        TextField("Model", text: $settings.geminiModel)
+          .textFieldStyle(.roundedBorder)
+      } header: {
+        Text("Gemini Configuration")
+      } footer: {
+        Text("Get your API key from Google AI Studio.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+
+    case .grok:
+      Section {
+        SecureField("API Key", text: $grokAPIKey)
+          .textFieldStyle(.roundedBorder)
+          .onChange(of: grokAPIKey) { _, newValue in
+            keychainManager.saveAPIKey(newValue, for: .grok)
+          }
+        TextField("Model", text: $settings.grokModel)
+          .textFieldStyle(.roundedBorder)
+      } header: {
+        Text("Grok Configuration")
+      } footer: {
+        Text("Get your API key from x.ai.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+    }
+  }
+
+  private var canTest: Bool {
+    switch settings.activeProvider {
+    case .ollama:
+      return !settings.ollamaURL.isEmpty
+    case .gemini:
+      return !geminiAPIKey.isEmpty
+    case .grok:
+      return !grokAPIKey.isEmpty
+    }
+  }
+
+  private func loadAPIKeys() {
+    geminiAPIKey = keychainManager.getAPIKey(for: .gemini) ?? ""
+    grokAPIKey = keychainManager.getAPIKey(for: .grok) ?? ""
   }
 
   private func testConnection() {
@@ -117,16 +197,14 @@ struct AISettingsView: View {
     testStatus = ""
 
     Task {
-      let client = OllamaClient(
-        baseURL: settings.ollamaURL,
-        model: settings.ollamaModel,
-        systemPrompt: "Reply with just: OK"
-      )
-
       do {
-        let response = try await client.generate(text: "test")
+        let factory = AIProviderFactory(settings: settings, keychainManager: keychainManager)
+        let provider = try factory.makeProvider()
+        let response = try await provider.rephrase(text: "Hello world")
+
         await MainActor.run {
-          testStatus = "Success: \(response.prefix(20))..."
+          let preview = response.prefix(30)
+          testStatus = "Success: \(preview)..."
           isTesting = false
         }
       } catch {
@@ -136,5 +214,36 @@ struct AISettingsView: View {
         }
       }
     }
+  }
+}
+
+// MARK: - PromptSettingsView
+
+struct PromptSettingsView: View {
+  @ObservedObject var settings: AppSettings
+
+  var body: some View {
+    Form {
+      Section {
+        TextEditor(text: $settings.systemPrompt)
+          .font(.body)
+          .frame(height: 120)
+          .border(Color.secondary.opacity(0.3), width: 1)
+      } header: {
+        Text("System Prompt")
+      } footer: {
+        Text("This prompt instructs the AI how to process your text.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+
+      Section {
+        Button("Reset to Default") {
+          settings.systemPrompt = "Fix grammar and make it sound professional. Only return the corrected text, nothing else."
+        }
+      }
+    }
+    .formStyle(.grouped)
+    .padding()
   }
 }

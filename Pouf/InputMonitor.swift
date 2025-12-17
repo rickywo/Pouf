@@ -102,15 +102,13 @@ final class InputMonitor: ObservableObject {
       return
     }
 
+    // Use AIProviderFactory to get the active provider
     let settings = AppSettings()
-    let client = OllamaClient(
-      baseURL: settings.ollamaURL,
-      model: settings.ollamaModel,
-      systemPrompt: settings.systemPrompt
-    )
+    let factory = AIProviderFactory(settings: settings)
 
     do {
-      let improvedText = try await client.generate(text: selectedText)
+      let provider = try factory.makeProvider()
+      let improvedText = try await provider.rephrase(text: selectedText)
       print("AI Response: \(improvedText)")
 
       // Paste improved text (replaces selection)
