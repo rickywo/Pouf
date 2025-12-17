@@ -70,6 +70,7 @@ struct GeneralSettingsView: View {
 
 struct AIProviderSettingsView: View {
   @ObservedObject var settings: AppSettings
+  @State private var selectedProvider: AIProviderType = .ollama
   @State private var testStatus = ""
   @State private var isTesting = false
   @State private var geminiAPIKey = ""
@@ -80,18 +81,69 @@ struct AIProviderSettingsView: View {
   var body: some View {
     Form {
       Section {
-        Picker("Active Provider", selection: $settings.activeProvider) {
+        Picker("Active Provider", selection: $selectedProvider) {
           ForEach(AIProviderType.allCases, id: \.self) { provider in
             Text(provider.displayName).tag(provider)
           }
         }
         .pickerStyle(.segmented)
+        .onChange(of: selectedProvider) { _, newValue in
+          settings.activeProvider = newValue
+          testStatus = ""
+        }
       } header: {
         Text("Select Provider")
       }
 
-      providerConfigSection
-        .id(settings.activeProvider)
+      switch selectedProvider {
+      case .ollama:
+        Section {
+          TextField("URL", text: $settings.ollamaURL)
+            .textFieldStyle(.roundedBorder)
+          TextField("Model", text: $settings.ollamaModel)
+            .textFieldStyle(.roundedBorder)
+        } header: {
+          Text("Ollama Configuration")
+        } footer: {
+          Text("Ollama runs locally. No API key required.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+
+      case .gemini:
+        Section {
+          SecureField("API Key", text: $geminiAPIKey)
+            .textFieldStyle(.roundedBorder)
+            .onChange(of: geminiAPIKey) { _, newValue in
+              keychainManager.saveAPIKey(newValue, for: .gemini)
+            }
+          TextField("Model", text: $settings.geminiModel)
+            .textFieldStyle(.roundedBorder)
+        } header: {
+          Text("Gemini Configuration")
+        } footer: {
+          Text("Get your API key from Google AI Studio.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+
+      case .grok:
+        Section {
+          SecureField("API Key", text: $grokAPIKey)
+            .textFieldStyle(.roundedBorder)
+            .onChange(of: grokAPIKey) { _, newValue in
+              keychainManager.saveAPIKey(newValue, for: .grok)
+            }
+          TextField("Model", text: $settings.grokModel)
+            .textFieldStyle(.roundedBorder)
+        } header: {
+          Text("Grok Configuration")
+        } footer: {
+          Text("Get your API key from x.ai.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+      }
 
       Section {
         HStack {
@@ -116,68 +168,13 @@ struct AIProviderSettingsView: View {
     .formStyle(.grouped)
     .padding()
     .onAppear {
+      selectedProvider = settings.activeProvider
       loadAPIKeys()
-    }
-    .onChange(of: settings.activeProvider) { _, _ in
-      testStatus = ""
-    }
-  }
-
-  @ViewBuilder
-  private var providerConfigSection: some View {
-    switch settings.activeProvider {
-    case .ollama:
-      Section {
-        TextField("URL", text: $settings.ollamaURL)
-          .textFieldStyle(.roundedBorder)
-        TextField("Model", text: $settings.ollamaModel)
-          .textFieldStyle(.roundedBorder)
-      } header: {
-        Text("Ollama Configuration")
-      } footer: {
-        Text("Ollama runs locally. No API key required.")
-          .font(.caption)
-          .foregroundStyle(.secondary)
-      }
-
-    case .gemini:
-      Section {
-        SecureField("API Key", text: $geminiAPIKey)
-          .textFieldStyle(.roundedBorder)
-          .onChange(of: geminiAPIKey) { _, newValue in
-            keychainManager.saveAPIKey(newValue, for: .gemini)
-          }
-        TextField("Model", text: $settings.geminiModel)
-          .textFieldStyle(.roundedBorder)
-      } header: {
-        Text("Gemini Configuration")
-      } footer: {
-        Text("Get your API key from Google AI Studio.")
-          .font(.caption)
-          .foregroundStyle(.secondary)
-      }
-
-    case .grok:
-      Section {
-        SecureField("API Key", text: $grokAPIKey)
-          .textFieldStyle(.roundedBorder)
-          .onChange(of: grokAPIKey) { _, newValue in
-            keychainManager.saveAPIKey(newValue, for: .grok)
-          }
-        TextField("Model", text: $settings.grokModel)
-          .textFieldStyle(.roundedBorder)
-      } header: {
-        Text("Grok Configuration")
-      } footer: {
-        Text("Get your API key from x.ai.")
-          .font(.caption)
-          .foregroundStyle(.secondary)
-      }
     }
   }
 
   private var canTest: Bool {
-    switch settings.activeProvider {
+    switch selectedProvider {
     case .ollama:
       return !settings.ollamaURL.isEmpty
     case .gemini:
