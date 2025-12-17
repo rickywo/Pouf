@@ -1,6 +1,6 @@
 # Pouf User Guide
 
-Pouf is a macOS menu bar app that provides system-wide AI text enhancement. Type in any app and instantly improve your text using a local AI.
+Pouf is a macOS menu bar app that provides system-wide AI text enhancement. Select any text and instantly improve it using a local AI.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Verify Ollama is running by visiting: http://localhost:11434
 
 Pouf needs macOS permissions to monitor keyboard input and inject text.
 
-1. Open **System Settings** → **Privacy & Security** → **Accessibility**
+1. Open **System Settings** > **Privacy & Security** > **Accessibility**
 2. Click the **lock icon** to make changes
 3. Enable **Pouf** in the list (click + to add if not visible)
 4. Also check **Input Monitoring** and enable Pouf there
@@ -34,25 +34,7 @@ Pouf needs macOS permissions to monitor keyboard input and inject text.
 
 ## Usage
 
-### Method 1: Magic Trigger (::fix)
-
-Type any text followed by `::fix` to enhance it:
-
-```
-hey boss, i cant come today, im sick::fix
-```
-
-Pouf will automatically:
-1. Detect the `::fix` trigger
-2. Send the preceding text to AI
-3. Replace your text with the improved version
-
-**Result:**
-```
-Hi, I won't be able to make it in today as I'm feeling unwell.
-```
-
-### Method 2: Hotkey (⌘⌥/)
+### Fix Selected Text (⌘⌥/)
 
 1. **Select** any text in any application
 2. Press **⌘ + ⌥ + /** (Command + Option + /)
@@ -60,13 +42,18 @@ Hi, I won't be able to make it in today as I'm feeling unwell.
 
 This works great for editing existing text in emails, documents, or chat apps.
 
+**Example:**
+1. Type: `hey boss, i cant come today, im sick`
+2. Select the text
+3. Press ⌘⌥/
+4. Result: `Hi, I won't be able to make it in today as I'm feeling unwell.`
+
 ## Settings
 
-Click the **Pouf icon** in the menu bar → **Settings** to configure:
+Click the **Pouf icon** in the menu bar > **Settings** to configure:
 
 ### General Tab
 - View permission status
-- See debug information (last typed characters)
 
 ### AI Tab
 - **Ollama URL:** Default is `http://localhost:11434`
@@ -105,7 +92,7 @@ Rewrite this as a professional business email. Only return the corrected text.
 ### Text not being replaced
 - Check that Ollama is running (`ollama serve`)
 - Verify the model is downloaded (`ollama list`)
-- Test connection in Settings → AI → "Test Connection"
+- Test connection in Settings > AI > "Test Connection"
 
 ### Slow response
 - Try a smaller/faster model like `mistral` or `phi`
@@ -122,14 +109,12 @@ Then re-grant permissions and restart the app.
 
 1. **Keep text short:** AI works best with sentences or short paragraphs
 2. **Be specific:** The system prompt guides the AI's behavior
-3. **Use selection method for edits:** The hotkey (⌘⌥/) is great for fixing existing text
-4. **Use trigger for new text:** Type naturally and add `::fix` when done
+3. **Select precisely:** Only the selected text will be processed and replaced
 
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| `::fix` | Trigger AI on preceding text |
 | `⌘⌥/` | Fix selected text |
 | `⌘Q` | Quit Pouf |
 

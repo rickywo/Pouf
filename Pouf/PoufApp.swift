@@ -27,7 +27,7 @@ struct PoufApp: App {
     }
 
     Settings {
-      SettingsView(permissions: permissions, inputMonitor: inputMonitor, settings: settings)
+      SettingsView(permissions: permissions, settings: settings)
     }
   }
 }

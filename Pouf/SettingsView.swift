@@ -2,14 +2,13 @@ import SwiftUI
 
 struct SettingsView: View {
   @ObservedObject var permissions: PermissionManager
-  @ObservedObject var inputMonitor: InputMonitor
   @ObservedObject var settings: AppSettings
   @State private var testStatus = ""
   @State private var isTesting = false
 
   var body: some View {
     TabView {
-      GeneralSettingsView(permissions: permissions, inputMonitor: inputMonitor)
+      GeneralSettingsView(permissions: permissions)
         .tabItem {
           Label("General", systemImage: "gear")
         }
@@ -19,7 +18,7 @@ struct SettingsView: View {
           Label("AI", systemImage: "brain")
         }
     }
-    .frame(width: 450, height: 320)
+    .frame(width: 450, height: 280)
   }
 }
 
@@ -27,7 +26,6 @@ struct SettingsView: View {
 
 struct GeneralSettingsView: View {
   @ObservedObject var permissions: PermissionManager
-  @ObservedObject var inputMonitor: InputMonitor
 
   var body: some View {
     Form {
@@ -54,23 +52,10 @@ struct GeneralSettingsView: View {
       }
 
       Section {
-        VStack(alignment: .leading, spacing: 8) {
-          Text("Type **::fix** after any text to trigger AI enhancement")
-            .font(.callout)
-          Text("Or use **⌘⌥/** to fix selected text")
-            .font(.callout)
-        }
+        Text("Use **⌘⌥/** to fix selected text with AI")
+          .font(.callout)
       } header: {
         Text("Usage")
-      }
-
-      Section {
-        Text(inputMonitor.lastKeyLog.isEmpty ? "No input yet..." : inputMonitor.lastKeyLog)
-          .font(.caption)
-          .foregroundStyle(.secondary)
-          .lineLimit(2)
-      } header: {
-        Text("Last Typed (Debug)")
       }
     }
     .formStyle(.grouped)
