@@ -169,15 +169,15 @@ export default function AppWindow() {
 
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium bg-pouf-purple/20 text-pouf-lavender border border-pouf-purple/30">
-              <img src="/icons/ollama-icon.svg" alt="Ollama" className="w-4 h-4" />
+              <img src={`${import.meta.env.BASE_URL}icons/ollama-icon.svg`} alt="Ollama" className="w-4 h-4" />
               Ollama
             </span>
             <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium bg-white/5 text-pouf-lavender/40 hover:bg-white/10 transition-colors cursor-pointer">
-              <img src="/icons/gemini-icon.png" alt="Gemini" className="w-4 h-4" />
+              <img src={`${import.meta.env.BASE_URL}icons/gemini-icon.png`} alt="Gemini" className="w-4 h-4" />
               Gemini
             </span>
             <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium bg-white/5 text-pouf-lavender/40 hover:bg-white/10 transition-colors cursor-pointer overflow-hidden">
-              <img src="/icons/grok-icon.svg" alt="Grok" className="w-4 h-4 rounded" />
+              <img src={`${import.meta.env.BASE_URL}icons/grok-icon.svg`} alt="Grok" className="w-4 h-4 rounded" />
               Grok
             </span>
           </div>

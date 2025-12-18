@@ -227,7 +227,7 @@ export default function HeroSection() {
             >
               <div className="w-14 h-14 mb-3 mx-auto flex items-center justify-center rounded-2xl bg-white/5 group-hover:bg-white/10 transition-colors border border-white/10">
                 <img
-                  src="/icons/ollama-icon.svg"
+                  src={`${import.meta.env.BASE_URL}icons/ollama-icon.svg`}
                   alt="Ollama"
                   className="w-9 h-9 object-contain group-hover:scale-110 transition-transform"
                 />
@@ -244,7 +244,7 @@ export default function HeroSection() {
             >
               <div className="w-14 h-14 mb-3 mx-auto flex items-center justify-center rounded-2xl bg-white/5 group-hover:bg-white/10 transition-colors border border-white/10">
                 <img
-                  src="/icons/gemini-icon.png"
+                  src={`${import.meta.env.BASE_URL}icons/gemini-icon.png`}
                   alt="Gemini"
                   className="w-9 h-9 object-contain group-hover:scale-110 transition-transform"
                 />
@@ -261,7 +261,7 @@ export default function HeroSection() {
             >
               <div className="w-14 h-14 mb-3 mx-auto flex items-center justify-center rounded-2xl overflow-hidden">
                 <img
-                  src="/icons/grok-icon.svg"
+                  src={`${import.meta.env.BASE_URL}icons/grok-icon.svg`}
                   alt="Grok"
                   className="w-14 h-14 object-cover group-hover:scale-110 transition-transform"
                 />
