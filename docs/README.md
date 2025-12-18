@@ -59,11 +59,6 @@ Each feature has its own subdirectory containing standardized planning documents
 2. Fill in each document with your feature-specific content.
 3. Update the checklist as you make progress.
 
-## Current Features
-
-- [flowstate](./flowstate/) - Documentation folder structure standardization
-- [01_configurable_ai_providers](./01_configurable_ai_providers/) - Multiple AI provider support
-
 ## Conventions
 
 - Feature directory names should be lowercase and use hyphens for spaces.

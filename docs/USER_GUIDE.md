@@ -56,10 +56,10 @@ Pouf needs macOS permissions to monitor keyboard input and inject text.
 
 ## Usage
 
-### Fix Selected Text (⌘⌥/)
+### Fix Selected Text
 
 1. **Select** any text in any application
-2. Press **⌘ + ⌥ + /** (Command + Option + /)
+2. Press your configured keyboard shortcut (default: **⌘ + ⌥ + /**)
 3. The selected text will be replaced with the AI-improved version
 
 This works great for editing existing text in emails, documents, or chat apps.
@@ -67,7 +67,7 @@ This works great for editing existing text in emails, documents, or chat apps.
 **Example:**
 1. Type: `hey boss, i cant come today, im sick`
 2. Select the text
-3. Press ⌘⌥/
+3. Press your keyboard shortcut
 4. Result: `Hi, I won't be able to make it in today as I'm feeling unwell.`
 
 ## Settings
@@ -75,8 +75,8 @@ This works great for editing existing text in emails, documents, or chat apps.
 Click the **Pouf icon** in the menu bar > **Settings** to configure:
 
 ### General Tab
-- View permission status
-- Usage instructions
+- **Permissions:** View and grant Accessibility access
+- **Keyboard Shortcut:** Configure your custom shortcut (default: ⌘⌥/)
 
 ### AI Provider Tab
 - **Select Provider:** Choose between Ollama, Gemini, or Grok
@@ -153,7 +153,8 @@ Then re-grant permissions and restart the app.
 
 | Shortcut | Action |
 |----------|--------|
-| `⌘⌥/` | Fix selected text |
+| Custom (default `⌘⌥/`) | Fix selected text |
+| `⌘,` | Open Settings |
 | `⌘Q` | Quit Pouf |
 
 ## Privacy
