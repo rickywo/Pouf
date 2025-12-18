@@ -109,11 +109,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-
-## GitHub Topics
-
-Add these topics to your repository settings for discoverability:
-
-```
-macos swift swiftui accessibility-api ai-assistant ollama gemini grok local-llm productivity text-enhancement writing-tool menu-bar-app
-```
