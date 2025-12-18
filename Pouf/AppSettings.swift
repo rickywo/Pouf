@@ -2,6 +2,16 @@ import Combine
 import Foundation
 
 final class AppSettings: ObservableObject {
+  // MARK: - Keyboard Shortcut
+
+  @Published var keyboardShortcut: KeyboardShortcut {
+    didSet {
+      if let data = try? JSONEncoder().encode(keyboardShortcut) {
+        UserDefaults.standard.set(data, forKey: "keyboardShortcut")
+      }
+    }
+  }
+
   // MARK: - Active Provider
 
   @Published var activeProvider: AIProviderType {
@@ -51,20 +61,33 @@ final class AppSettings: ObservableObject {
   // MARK: - Initialization
 
   init() {
+    // Keyboard shortcut
+    if let data = UserDefaults.standard.data(forKey: "keyboardShortcut"),
+       let shortcut = try? JSONDecoder().decode(KeyboardShortcut.self, from: data) {
+      self.keyboardShortcut = shortcut
+    } else {
+      self.keyboardShortcut = .default
+    }
+
+    // Active provider
     let providerString = UserDefaults.standard.string(forKey: "activeProvider") ?? "ollama"
     self.activeProvider = AIProviderType(rawValue: providerString) ?? .ollama
 
+    // System prompt
     self.systemPrompt = UserDefaults.standard.string(forKey: "systemPrompt")
       ?? "Fix grammar and make it sound professional. Only return the corrected text, nothing else."
 
+    // Ollama settings
     self.ollamaURL = UserDefaults.standard.string(forKey: "ollamaURL")
       ?? "http://localhost:11434"
     self.ollamaModel = UserDefaults.standard.string(forKey: "ollamaModel")
       ?? "llama3"
 
+    // Gemini settings
     self.geminiModel = UserDefaults.standard.string(forKey: "geminiModel")
       ?? "gemini-2.0-flash"
 
+    // Grok settings
     self.grokModel = UserDefaults.standard.string(forKey: "grokModel")
       ?? "grok-3-latest"
   }

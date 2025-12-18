@@ -9,14 +9,37 @@ final class InputMonitor: ObservableObject {
 
   private var eventTap: CFMachPort?
   private let textInjector = TextInjector()
-  private let hotkeyKeyCode: Int64 = 44 // Cmd + Option + / (keyCode 44)
+  private let settings: AppSettings
+  private var cancellables = Set<AnyCancellable>()
+
+  // Thread-safe storage for shortcut configuration
+  private nonisolated(unsafe) var configuredKeyCode: Int64 = 44
+  private nonisolated(unsafe) var configuredModifiers: CGEventFlags = [.maskCommand, .maskAlternate]
 
   // MARK: - Initialization
 
-  init() {
+  init(settings: AppSettings) {
+    self.settings = settings
+    updateShortcutConfiguration(settings.keyboardShortcut)
+    observeShortcutChanges()
+
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
       self?.startMonitoring()
     }
+  }
+
+  private func updateShortcutConfiguration(_ shortcut: KeyboardShortcut) {
+    configuredKeyCode = Int64(shortcut.keyCode)
+    configuredModifiers = shortcut.cgEventFlags
+  }
+
+  private func observeShortcutChanges() {
+    settings.$keyboardShortcut
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] newShortcut in
+        self?.updateShortcutConfiguration(newShortcut)
+      }
+      .store(in: &cancellables)
   }
 
   // MARK: - Event Monitoring
@@ -57,14 +80,29 @@ final class InputMonitor: ObservableObject {
     let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
     let flags = event.flags
 
-    // Check for hotkey: Cmd + Option + /
-    guard keyCode == hotkeyKeyCode,
-          flags.contains(.maskCommand),
-          flags.contains(.maskAlternate) else { return }
+    // Check for configured hotkey
+    guard keyCode == configuredKeyCode,
+          matchesConfiguredModifiers(flags) else { return }
 
     Task { @MainActor in
       self.triggerHotkeyFix()
     }
+  }
+
+  nonisolated private func matchesConfiguredModifiers(_ flags: CGEventFlags) -> Bool {
+    let requiredModifiers = configuredModifiers
+    let hasCommand = requiredModifiers.contains(.maskCommand)
+    let hasOption = requiredModifiers.contains(.maskAlternate)
+    let hasControl = requiredModifiers.contains(.maskControl)
+    let hasShift = requiredModifiers.contains(.maskShift)
+
+    // Check that all required modifiers are present
+    if hasCommand && !flags.contains(.maskCommand) { return false }
+    if hasOption && !flags.contains(.maskAlternate) { return false }
+    if hasControl && !flags.contains(.maskControl) { return false }
+    if hasShift && !flags.contains(.maskShift) { return false }
+
+    return true
   }
 
   // MARK: - Hotkey Actions
@@ -103,7 +141,6 @@ final class InputMonitor: ObservableObject {
     }
 
     // Use AIProviderFactory to get the active provider
-    let settings = AppSettings()
     let factory = AIProviderFactory(settings: settings)
 
     do {
