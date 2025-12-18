@@ -155,7 +155,12 @@ export default function HeroSection() {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="flex items-center justify-center gap-4 mt-10"
           >
-            <button className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-pouf-purple to-pouf-purple-dark text-white font-semibold hover:shadow-glow-md transition-all duration-300 hover:scale-105">
+            <a
+              href="https://github.com/rickywo/Pouf/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-pouf-purple to-pouf-purple-dark text-white font-semibold hover:shadow-glow-md transition-all duration-300 hover:scale-105"
+            >
               <span className="flex items-center gap-2">
                 Download for macOS
                 <motion.span
@@ -165,7 +170,7 @@ export default function HeroSection() {
                   →
                 </motion.span>
               </span>
-            </button>
+            </a>
             <a
               href="https://github.com/rickywo/Pouf"
               target="_blank"
