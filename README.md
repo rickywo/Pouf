@@ -24,10 +24,31 @@ Built with SwiftUI and the Accessibility API, it runs silently in the background
 
 ## Installation
 
-1. Download the latest release from the [Releases](https://github.com/rickywo/Pouf/releases) page
-2. Move `Pouf.app` to your Applications folder
-3. Launch Pouf—it will appear in your menu bar
-4. Grant Accessibility permissions when prompted
+### Download
+
+1. Download the latest `.dmg` file from the [Releases](https://github.com/rickywo/Pouf/releases) page
+2. Open the DMG and drag `Pouf.app` to your Applications folder
+
+### Important: Opening an Unsigned App
+
+Since Pouf is not notarized with Apple, macOS Gatekeeper will block it by default. Here's how to open it safely:
+
+> **Warning:** Do NOT double-click the app to open it the first time. macOS will show a scary message saying *"Pouf cannot be opened because it is from an unidentified developer"* or *"Pouf is damaged and can't be opened"* with only an option to move it to Trash.
+
+**The Override Trick:**
+
+1. **Right-click** (or Control-click) on `Pouf.app` in your Applications folder
+2. Select **"Open"** from the context menu
+3. A dialog will appear with a warning, but this time there will be an **"Open"** button
+4. Click **"Open"** to launch Pouf
+
+After doing this once, you can open Pouf normally by double-clicking.
+
+### First Launch
+
+1. Pouf will appear in your menu bar (look for the Pouf icon)
+2. Grant **Accessibility permissions** when prompted (required for text selection)
+3. Configure your preferred AI provider in Settings
 
 For detailed setup instructions, see the [User Guide](docs/USER_GUIDE.md).
 
