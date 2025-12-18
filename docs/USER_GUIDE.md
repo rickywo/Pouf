@@ -1,15 +1,25 @@
 # Pouf User Guide
 
-Pouf is a macOS menu bar app that provides system-wide AI text enhancement. Select any text and instantly improve it using a local AI.
+Pouf is a macOS menu bar app that provides system-wide AI text enhancement. Select any text and instantly improve it using your choice of AI provider.
+
+## Supported AI Providers
+
+Pouf supports three AI providers:
+
+| Provider | Type | API Key Required |
+|----------|------|------------------|
+| **Ollama** | Local | No |
+| **Gemini** | Cloud | Yes |
+| **Grok** | Cloud | Yes |
 
 ## Prerequisites
 
-### 1. Install Ollama
+### Option 1: Ollama (Local, Free)
 
-Pouf requires [Ollama](https://ollama.ai) running locally to process text.
+For privacy-focused local processing:
 
 ```bash
-# Install Ollama (if not already installed)
+# Install Ollama
 brew install ollama
 
 # Start Ollama service
@@ -21,7 +31,19 @@ ollama pull llama3
 
 Verify Ollama is running by visiting: http://localhost:11434
 
-### 2. Grant Permissions
+### Option 2: Gemini (Cloud)
+
+1. Visit [Google AI Studio](https://aistudio.google.com/)
+2. Create an API key
+3. Enter the key in Pouf Settings > AI Provider
+
+### Option 3: Grok (Cloud)
+
+1. Visit [x.ai](https://x.ai/)
+2. Create an API key
+3. Enter the key in Pouf Settings > AI Provider
+
+### Grant Permissions
 
 Pouf needs macOS permissions to monitor keyboard input and inject text.
 
@@ -54,11 +76,19 @@ Click the **Pouf icon** in the menu bar > **Settings** to configure:
 
 ### General Tab
 - View permission status
+- Usage instructions
 
-### AI Tab
-- **Ollama URL:** Default is `http://localhost:11434`
-- **Model:** The Ollama model to use (e.g., `llama3`, `mistral`, `codellama`)
+### AI Provider Tab
+- **Select Provider:** Choose between Ollama, Gemini, or Grok
+- **Provider Configuration:** Settings specific to the selected provider
+  - **Ollama:** URL and model name
+  - **Gemini:** API key and model name
+  - **Grok:** API key and model name
+- **Test Connection:** Verify your provider is working
+
+### Prompt Tab
 - **System Prompt:** Customize how the AI processes your text
+- **Reset to Default:** Restore the default prompt
 
 ### Default System Prompt
 ```
@@ -90,12 +120,19 @@ Rewrite this as a professional business email. Only return the corrected text.
 - Restart Pouf
 
 ### Text not being replaced
-- Check that Ollama is running (`ollama serve`)
-- Verify the model is downloaded (`ollama list`)
-- Test connection in Settings > AI > "Test Connection"
+- Check that your provider is configured correctly
+- Use "Test Connection" in Settings > AI Provider
+- For Ollama: ensure the service is running (`ollama serve`)
+- For Gemini/Grok: verify your API key is correct
+
+### "API key is required"
+- Go to Settings > AI Provider
+- Enter your API key for Gemini or Grok
+- Or switch to Ollama which doesn't require an API key
 
 ### Slow response
-- Try a smaller/faster model like `mistral` or `phi`
+- For Ollama: try a smaller/faster model like `mistral` or `phi`
+- For cloud providers: response time depends on network latency
 - Ensure no other heavy processes are using your GPU/CPU
 
 ### Reset Permissions
@@ -110,6 +147,7 @@ Then re-grant permissions and restart the app.
 1. **Keep text short:** AI works best with sentences or short paragraphs
 2. **Be specific:** The system prompt guides the AI's behavior
 3. **Select precisely:** Only the selected text will be processed and replaced
+4. **Test your provider:** Use "Test Connection" after configuring a new provider
 
 ## Keyboard Shortcuts
 
@@ -120,7 +158,7 @@ Then re-grant permissions and restart the app.
 
 ## Privacy
 
-Pouf is completely private:
-- All AI processing happens locally via Ollama
-- No data is sent to external servers
-- Your text never leaves your machine
+- **Ollama:** All processing happens locally. Your text never leaves your machine.
+- **Gemini/Grok:** Text is sent to cloud APIs for processing. Review their privacy policies.
+
+API keys are stored securely in the macOS Keychain.

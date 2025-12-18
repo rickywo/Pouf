@@ -6,7 +6,7 @@ struct SettingsView: View {
 
   var body: some View {
     TabView {
-      GeneralSettingsView(permissions: permissions)
+      GeneralSettingsView(permissions: permissions, settings: settings)
         .tabItem {
           Label("General", systemImage: "gear")
         }
@@ -29,6 +29,7 @@ struct SettingsView: View {
 
 struct GeneralSettingsView: View {
   @ObservedObject var permissions: PermissionManager
+  @ObservedObject var settings: AppSettings
 
   var body: some View {
     Form {
@@ -55,10 +56,13 @@ struct GeneralSettingsView: View {
       }
 
       Section {
-        Text("Use **⌘⌥/** to fix selected text with AI")
-          .font(.callout)
+        ShortcutRecorderView(shortcut: $settings.keyboardShortcut)
       } header: {
-        Text("Usage")
+        Text("Keyboard Shortcut")
+      } footer: {
+        Text("Press the shortcut you want to use to fix selected text with AI.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
       }
     }
     .formStyle(.grouped)
